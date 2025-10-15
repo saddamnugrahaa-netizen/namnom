@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Maafin Aku — Permintaan Maaf</title>
+  <style>
+    :root{
+      --pink:#ffc1da;
+      --deep-pink:#ff6fa3;
+      --card:#fff0f6;
+      --text:#5b2a3a;
+      --glass: rgba(255,255,255,0.6);
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body,#app{height:100%;margin:0}
+    body{
+      background: linear-gradient(135deg,#fff0f6 0%, #fff7fb 50%, #fff0f6 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      overflow:hidden;
+    }
+
+    /* heart cursor trail */
+    .heart{
+      position:fixed;pointer-events:none;z-index:9999;opacity:0;transform:translate(-50%,-50%) scale(0.6);
+      transition:opacity .3s, transform .3s;will-change:transform,opacity
+    }
+    .heart svg{width:20px;height:20px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.12));}
+
+    /* container */
+    .page{display:none;height:100%;width:100%;align-items:center;justify-content:center;padding:32px}
+    .page.active{display:flex}
+    .card{
+      max-width:760px;width:100%;background:var(--card);border-radius:18px;padding:32px;box-shadow:0 10px 30px rgba(95,32,64,0.12);backdrop-filter: blur(6px);
+    }
+    h1{margin:0 0 12px;font-size:28px;color:var(--deep-pink)}
+    p{line-height:1.6}
+
+    .buttons{display:flex;gap:16px;margin-top:22px}
+    .btn{padding:12px 20px;border-radius:12px;border:none;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+    .btn.yes{background:linear-gradient(90deg,var(--deep-pink),#ff85b6);color:white}
+    .btn.no{background:transparent;border:2px solid rgba(91,42,58,0.08);color:var(--text)}
+
+    .footer{margin-top:12px;font-size:13px;color:#8a5a6a}
+
+    /* small hearts floating in background */
+    .bg-heart{position:absolute;opacity:0.08;}
+
+    /* page2 video */
+    .video-wrap{width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden}
+    .controls{display:flex;justify-content:flex-end;margin-top:16px}
+
+    /* page3 */
+    .thanks{display:flex;align-items:center;justify-content:center;height:60vh}
+    .thanks .card{max-width:520px;text-align:center}
+
+    @media (max-width:600px){.card{padding:20px}h1{font-size:20px}}
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- floating decorative hearts -->
+    <svg class="bg-heart" style="left:10%;top:12%;width:200px;transform:rotate(-15deg)"><use/></svg>
+
+    <!-- Page 1 -->
+    <main id="page1" class="page active">
+      <div class="card">
+        <h1>Namnom… maafin damdom, please 💌</h1>
+        <p>Namnom, maafin kesalahan damdom setahun lalu. Damdom buat kesalahan besar saat pdkt. Damdom genuinely tak bermaksud jadiin namnom pilihan kedua, tapi saat itu aku bingung dan baru nemu orang yang paling aku cari selama ini. Maafin damdom dongo egois emg bodo. Damdom juga gak akan kasi pembelaan apapun atau membenarkan perilaku damdom — kamu wajar banget sampe kaya gini. Kasi aku kesempatan yah buat buktiin ke namnom dan bisa lebih baik buat namnom.</p>
+
+        <div class="buttons">
+          <button id="yesBtn" class="btn yes">Ya, namnom kasi kesempatan</button>
+          <button id="noBtn" class="btn no">Tidak, kita tetap putus</button>
+        </div>
+        <div class="footer">Tip: gerakkan kursor ke tombol yang <em>tidak</em> mau — dia kadang menghilang 😅</div>
+      </div>
+    </main>
+
+    <!-- Page 2 -->
+    <section id="page2" class="page">
+      <div class="card">
+        <h1>Terima kasih sudah mau dengarkan</h1>
+        <p>Damdom udah janji untuk berubah. Dengarkan sedikit lagu ini bersama.</p>
+        <div class="video-wrap" id="videoWrap">
+          <!-- YouTube embed will be inserted here -->
+        </div>
+        <div class="controls">
+          <button id="toPage3" class="btn yes">Lanjutkan</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 3 -->
+    <section id="page3" class="page">
+      <div class="thanks">
+        <div class="card">
+          <h1>Terima kasih untuk selama ini</h1>
+          <p>Semoga kita bisa mulai lagi dari awal yang lebih baik. ❤️</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- hearts that follow cursor -->
+  </div>
+
+  <script>
+    // ========== Heart cursor trail ===========
+    const HEART_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="var(--deep-pink)" d="M12 21s-7.333-4.873-9.06-7.045C.942 11.99 3.556 6.5 8 6.5c1.98 0 3.213 1.03 4 2.286C12.787 7.53 14.02 6.5 16 6.5c4.445 0 7.057 5.49 5.06 7.455C19.333 16.127 12 21 12 21z"/></svg>`;
+    function makeHeart(x,y){
+      const el = document.createElement('div');
+      el.className='heart';
+      el.style.left = x+'px';
+      el.style.top = y+'px';
+      el.innerHTML = HEART_SVG;
+      document.body.appendChild(el);
+      requestAnimationFrame(()=>{el.style.opacity=1;el.style.transform='translate(-50%,-50%) scale(1)';});
+      setTimeout(()=>{el.style.opacity=0;el.style.transform='translate(-50%,-50%) scale(0.6)';},600);
+      setTimeout(()=>el.remove(),1000);
+    }
+    document.addEventListener('mousemove', (e)=>{ for(let i=0;i<1;i++){ makeHeart(e.clientX + (Math.random()-0.5)*12, e.clientY + (Math.random()-0.5)*12) } });
+
+    // ========== Page logic ===========
+    const page1 = document.getElementById('page1');
+    const page2 = document.getElementById('page2');
+    const page3 = document.getElementById('page3');
+
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+
+    function showPage(n){
+      page1.classList.remove('active');
+      page2.classList.remove('active');
+      page3.classList.remove('active');
+      if(n===1) page1.classList.add('active');
+      if(n===2) page2.classList.add('active');
+      if(n===3) page3.classList.add('active');
+    }
+
+    // When YES clicked -> page2 and start music (user interaction allows autoplay)
+    yesBtn.addEventListener('click', ()=>{
+      showPage(2);
+      // inject YouTube iframe for "Nadin Amizah - Di Akhir Perang" (official video)
+      const vidId = 'DD6cg7EY31s'; // official video id discovered
+      const iframe = document.createElement('iframe');
+      iframe.width='100%';iframe.height='100%';iframe.allow='autoplay; fullscreen; picture-in-picture';
+      iframe.src = `https://www.youtube.com/embed/${vidId}?autoplay=1&modestbranding=1&rel=0`;
+      iframe.frameBorder=0;
+      const wrap = document.getElementById('videoWrap');
+      wrap.innerHTML='';wrap.appendChild(iframe);
+    });
+
+    // Lanjutkan to page 3
+    document.getElementById('toPage3').addEventListener('click', ()=> showPage(3));
+
+    // ========== No button evasive behavior ===========
+    function placeNoRandomly(){
+      const pad = 12;
+      const w = window.innerWidth - noBtn.offsetWidth - pad;
+      const h = window.innerHeight - noBtn.offsetHeight - pad;
+      const x = Math.floor(Math.random()*w) + pad;
+      const y = Math.floor(Math.random()*h) + pad;
+      noBtn.style.position='fixed';
+      noBtn.style.left = x+'px';
+      noBtn.style.top = y+'px';
+    }
+
+    // On mouseenter, sometimes hide briefly, otherwise move to random location
+    noBtn.addEventListener('mouseenter', ()=>{
+      // 40% chance to disappear briefly
+      if(Math.random() < 0.4){
+        noBtn.style.opacity = '0';
+        noBtn.style.pointerEvents = 'none';
+        // reappear at random spot after a short delay
+        setTimeout(()=>{ placeNoRandomly(); noBtn.style.opacity='1'; noBtn.style.pointerEvents='auto'; }, 300 + Math.random()*900);
+      } else {
+        placeNoRandomly();
+      }
+    });
+
+    // Also move the button when the user tries to click (mousedown)
+    noBtn.addEventListener('mousedown', (e)=>{ e.preventDefault(); placeNoRandomly(); });
+
+    // prevent keyboard access to the NO button being easy: when focused, move it
+    noBtn.addEventListener('focus', ()=> placeNoRandomly());
+
+    // initialize position centered for both
+    function centerButtons(){
+      yesBtn.style.position='relative';
+      noBtn.style.position='relative';
+    }
+    centerButtons();
+
+    // Keep responsive on resize: if NO is fixed, ensure it's inside
+    window.addEventListener('resize', ()=>{ if(noBtn.style.position==='fixed') placeNoRandomly(); });
+
+    // Accessibility: if someone manages to click NO, we'll still respect it (go to page3 with a different message)
+    noBtn.addEventListener('click', ()=>{
+      showPage(3);
+      const card = page3.querySelector('.card');
+      card.querySelector('h1').textContent = 'Keputusan diterima';
+      card.querySelector('p').textContent = 'Kalau ini yang namnom pilih, damdom terima dan akan menghargai keputusanmu. Terima kasih atas waktumu.';
+    });
+
+    // Make sure the heart trail doesn't create too many elements if left open
+    setInterval(()=>{
+      const hearts = document.querySelectorAll('.heart');
+      if(hearts.length > 40) hearts.forEach((h,i)=>{ if(i%2===0) h.remove(); });
+    },2000);
+
+  </script>
+</body>
+</html>
